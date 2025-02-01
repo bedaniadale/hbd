@@ -75,14 +75,14 @@
             const slideDiv = document.createElement('div');
             slideDiv.classList.add('slide');
             if (index === 0) slideDiv.classList.add('active');
-            
+
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('message');
             messageDiv.innerHTML = `<h1>${slide.title}</h1><p>${slide.message}</p>`;
-            
+
             const imageContainer = document.createElement('div');
             imageContainer.classList.add('image-container');
-            
+
             slide.images.forEach((imgSrc, i) => {
                 const img = document.createElement('img');
                 img.src = imgSrc;
@@ -93,7 +93,7 @@
                 });
                 imageContainer.appendChild(img);
             });
-            
+
             slideDiv.appendChild(messageDiv);
             slideDiv.appendChild(imageContainer);
             slidesContainer.appendChild(slideDiv);
