@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Happy Birthday!</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #f0e4f7; font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; }
+        .container { position: relative; width: 390px;background: #f0e4f7; display: flex; flex-direction: column; align-items: center; }
+        .slide { display: none; text-align: center; width: 100%; }
+        .slide.active { display: flex; flex-direction: column; align-items: center; }
+        .image-container { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 20px; flex-wrap: wrap; padding: 0 1rem}
+        .image-container img { width: 100%; max-width: 120px; height: auto; object-fit: cover; transition: transform 0.3s ease-in-out; opacity: 0.7; border-radius: 10px; cursor: pointer; }
+        .image-container img.active { opacity: 1; transform: scale(1.2); }
+        .message { color: #3a3939; text-align: center; padding: 20px; background: rgba(0, 0, 0, 0.1); border-radius: 15px; margin-top: 20px; margin-bottom: 20px; width: 80%; }
+        h1 { font-size: 1.7em; color: darkviolet; }
+        p { font-size: 1.2em; color: rgb(146, 26, 146)}
+        .navigation { position: absolute; top: 50%; left: 10px; right: 10px; display: flex; justify-content: space-between; transform: translateY(-50%); }
+        .nav-btn { background: rgba(41, 40, 40, 0.3); border: none; width: 50px; height: 50px; border-radius: 50%; color: #000; font-size: 1.5em; cursor: pointer; transition: background 0.3s; }
+        .nav-btn:hover { background: rgba(255, 255, 255, 0.5); }
+        .popup { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.8); display: none; justify-content: center; align-items: center; }
+        .popup img { max-width: 90%; max-height: 90%; border-radius: 10px; }
+        .popup.active { display: flex; }
+    </style>
+</head>
+<body>
+
+    <audio id="bgMusic" loop autoplay>
+        <source src="music.mp3" type="audio/mp3">
+        Your browser does not support the audio element.
+    </audio>
+
+    <div class="container" id="slidesContainer"></div>
+    <div class="navigation">
+        <button class="nav-btn prev-btn">←</button>
+        <button class="nav-btn next-btn">→</button>
+    </div>
+    <div class="popup" id="popup">
+        <img id="popupImg" src="" alt="Zoomed Image">
+    </div>
+    <script>
+        const slidesData = [
+            { title: "Hi!", message: "For your eyes only, okay?", images: [] },
+            { title: "Oks naba? ^___^", message: "Wala na bang ibang nakakakita?", images: [] },
+            { title: "So ayun", message: "Summary muna.....", images: [] },
+            { title: "READY NABAAAAA", message: "Click mo nalang pics ha para makita mo maayos...", images: [] },
+
+            { title: "Exactly a year ago! 🤩", message: "Hahaha landian days palang", images: ["./feb.jpg"] },
+            { title: "March", message: "Patagong Mga Labas and Red dot 🫣🥰", images: ["./march.jpg"] },
+            { title: "April", message: "Nagstart ako manligaw 😽 (thank you sa pagpayag) <br> <br> first couple outfit sa okasyon hahah", images: ["./April1.jpg", "./April2.jpg"] },
+            { title: "May", message: "Heto sinamahan moko sa mga memorabe na mga first time ko 😍!! <br> <br> FIRST PERFORMANCE SA BUONG BUHAY KOOO AT FIRST MALAKIHANG SAHOD KOOOO", images: ["./may1.jpg", "./may2.jpg", "./may3.jpg", "./may4.jpg"] },
+            { title: "June", message: "Heto mga may sahod days ko! As much as possible sinusulit ko matreat ka sa bawat labas natin + grab days pa, wala pang lisensya kaya di madala motor sa clark! 🤣 insert narin mga bonding natin sa house nyo", images: ["./june1.jpg", "./june2.jpg", "./june3.jpg",] },
+            { title: "July", message: "2nd coupleeee outfit hahaha fave color ko pa which is black!! <br> <br> AND YUNG UNFORGETTABLE BAGUIO SA BAGYO! HAHAHA 😻 MGA SNEAKY NA HAWAKAN NATIN SA KWARTOOO HAHAHA AND YUNG BAGO MATULOGGG I LUV DOING IT SNEAKY WITH YOUUU 🤭", images: ["./july1.jpg", "./july2.jpg", "./july3.jpg", "./july4.jpg"] },
+            { title: "August", message: "Busy na sa OJT and may class ka na rin, so pasundot sundot tayo ng mga dates whenever free and mga after class! haha", images: ["./aug1.jpg", "./aug2.jpg", "./aug3.jpg"] },
+            { title: "September", message: "Ganun padin dates and mga bonding sa bahay nyo haha nakaramdam ka na rin ng parang want mo na magstop here huhu", images: ["./sep.jpg"] },
+            { title: "October", message: "Pinilit kita na ituloy and thanks kasi tinatry mo padin mag stay sakin, ayun may ups and downs hahaha nameet mo rin si waffle and we're doing it patago sa kwarto nila ate ^__^", images: ["./oct1.jpg", "./oct2.jpg","./oct3.jpg" ] },
+
+            { title: "November", message: "Nasasama kita sa mga labas ng fam namin and nameet mo mga tita ko! hahaha saya!! <333", images: ["./nov1.jpg", "./nov3.jpg","./nov4.jpg" ] },
+
+            { title: "EXTRAAAA", message: "MY 2 BABIESSSSS 🫶", images: ["./novextra.jpg"] },
+            { title: "December", message: "Nagkaroon na ng misunderstanding but still may mga times na nagsasama parin us and nagddate hihi", images: ["./dec.jpg"] },
+            { title: "January", message: "MOST RECENT ONE 😉 JANUARY 31 TO SAKTO HAHAHA solid padin ang binigay mo sakin! labyu", images: ["./january.jpg"] },
+
+            { title: "HELLO ANDITO KANAAA", message: "Happy birthday baby ko. Sorry if we are not yet official pa ule ha, pero wait mo lang me makagraduate po 😉 Lapit na rin naman po yun baby, onting tiis nalang. Goodluck lagi sa studies mo and andito lang ako lagi para maging support sa likod mo lagi. Di lang kita isusupport sa likod mo lagi, titirahin pa kita patalikod kung gusto mo... HAHHA KEMI love you baby. 10 years na rin since nung taon na nakilala kita and almost half ng buhay ko na may pagiisip na ko is kasama kita and kilala kita. Grateful ako na nakilala kita, 10 years and ikaw padin tong gusto ko, feel ko talaga para sakin ka. Lakas ng tama ko sau kung alam mo lang, mula nung una kita makita nung ensayo pnk nung bago kyong dating. Thank you sa pagtanggap ng flaws ko and helping me to be better lalo na for myself. <br><br> Thank you kasi pinagbibigyan moko sa mga bagay na gusto ko gawin sayo lalo na you are my dream girl, mula sa pag care, sa katawan, boses mo ay napakasarap sa tenga, kahit pakinggan ko yan buong araw okay lang, di ako magsasawa. <br> <br> HAHAHA keep this private for yourself my love, mwa mwa. Love you po! <strong> Happy birthday my future wife! 🥳 </strong>", images: [] },
+
+
+
+        ];
+
+        const slidesContainer = document.getElementById('slidesContainer');
+        let currentSlide = 0;
+
+        slidesData.forEach((slide, index) => {
+            const slideDiv = document.createElement('div');
+            slideDiv.classList.add('slide');
+            if (index === 0) slideDiv.classList.add('active');
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.innerHTML = `<h1>${slide.title}</h1><p>${slide.message}</p>`;
+            
+            const imageContainer = document.createElement('div');
+            imageContainer.classList.add('image-container');
+            
+            slide.images.forEach((imgSrc, i) => {
+                const img = document.createElement('img');
+                img.src = imgSrc;
+                if (i === 0) img.classList.add('active');
+                img.addEventListener('click', () => {
+                    document.getElementById('popupImg').src = imgSrc;
+                    document.getElementById('popup').classList.add('active');
+                });
+                imageContainer.appendChild(img);
+            });
+            
+            slideDiv.appendChild(messageDiv);
+            slideDiv.appendChild(imageContainer);
+            slidesContainer.appendChild(slideDiv);
+        });
+
+        const slides = document.querySelectorAll('.slide');
+        document.getElementById('popup').addEventListener('click', () => {
+            document.getElementById('popup').classList.remove('active');
+        });
+
+        function showSlide(direction) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (direction === 'next') ? (currentSlide + 1) % slides.length : (currentSlide - 1 + slides.length) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }
+
+        document.querySelector('.next-btn').addEventListener('click', () => showSlide('next'));
+        document.querySelector('.prev-btn').addEventListener('click', () => showSlide('prev'));
+    </script>
+</body>
+</html>
